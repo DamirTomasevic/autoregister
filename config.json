@@ -1,0 +1,9 @@
+{
+    "locations": [
+        {"id": 5, "name": "UK - London", "country_code": "GB"},
+        {"id": 53, "name": "UK - Docklands", "country_code": "GB"},
+        {"id": 178, "name": "UK - East London", "country_code": "GB"},
+        {"id": 15, "name": "UK - Midlands", "country_code": "GB"}
+    ],
+    "password": "Jason1234!"
+}
