@@ -1,1 +1,1 @@
-# autoregister
+# autoregister_sky
