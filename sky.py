@@ -221,39 +221,6 @@ def select_gender(driver, gender, row):
 
 def fill_additional_details_1(driver, row):
     print(f"fill_additional_details_1_started")
-    try:
-        select_gender(driver, row['title'],row)
-        firstname = driver.find_element(By.NAME, "firstname")
-        lastname = driver.find_element(By.NAME, "lastname")
-        move_and_click(driver, firstname)
-        type_slowly(firstname, row['forename'])
-
-        move_and_click(driver, lastname)
-        type_slowly(lastname, row['surname'])
-
-        date_of_birth = pd.to_datetime(row['date_of_birth'])
-
-        dayElement = driver.find_element(By.NAME, "day")
-        type_slowly(dayElement, str(date_of_birth.day))
-        move_and_click(driver,dayElement)
-
-        monthElement = driver.find_element(By.NAME, "month")
-        type_slowly(monthElement, str(date_of_birth.month))
-        move_and_click(driver,monthElement)
-        
-        yearElement=driver.find_element(By.NAME, "year")
-        type_slowly(yearElement, str(date_of_birth.year))
-        move_and_click(driver,yearElement)
-
-        
-        # click_continue_button(driver,2)
-        
-        print(f"fill_additional_details_1_finished")
-    except Exception as e:
-        print(f"Error filling additional details1: {e}")
-        driver.quit()  # Quit the driver immediately upon error
-        raise  # Re-raise the exception for further handling
-
 
         
 def toggle_select_all_promotion_options(driver,row):
