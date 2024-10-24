@@ -19,43 +19,15 @@ import string
 pyautogui.FAILSAFE = False
 current_time = int(datetime.now().timestamp())
 random.seed(current_time)
-def generate_strong_password(length=8):
-    if length < 8:
-        raise ValueError("Password length should be at least 8 characters")
-
-    # Define the required characters
-    lower = string.ascii_lowercase  # a-z
-    upper = string.ascii_uppercase  # A-Z
-    digits = string.digits          # 0-9
-    all_chars = lower + upper + digits
-    
-    # Ensure at least one upper case letter and one digit
-    password = [
-        random.choice(upper),   # At least one upper case letter
-        random.choice(digits)   # At least one digit
-    ]
-
-    # Fill the rest of the password with random characters
-    password += random.choices(all_chars, k=length - 2)
-
-    # Shuffle to ensure randomness
-    random.shuffle(password)
-    
-    return ''.join(password)
-
 with open('config.json', 'r') as config_file:
     config = json.load(config_file)
     # URL of the proxy list
 with open('url.txt', 'r') as file:
     landing_url = file.read().strip()
-user_password= "Jason1234!"
-
 locations = config['locations']
-
 # Load the Excel file
 file_path = 'data.xlsx'  # Path to your Excel file
-
-chrome_driver_path = "C:\\Users\\Administrator\\Documents\\PPH\\sky\\chromedriver-win64\\chromedriver.exe"
+chrome_driver_path = "C:\\Users\\Administrator\\Documents\\PPH\\sky\\sky\\chromedriver-win64\\chromedriver.exe"
 data = pd.read_excel(file_path)
 
 
@@ -64,27 +36,19 @@ data = pd.read_excel(file_path)
 # Function to set up the Selenium WebDriver with proxy
 def setup_driver():
     global chrome_driver_path
-
     service = Service(executable_path=chrome_driver_path)
-
     chrome_options = Options()
     # chrome_options.add_experimental_option("debuggerAddress", debugger_address)
 
-    
     user_agent = UserAgent().random  # Random User-Agent for the session
     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
     chrome_options.add_argument(f"user-agent={user_agent}")
-
-
     chrome_options.add_argument("--disable-infobars")
     chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
     chrome_options.add_experimental_option('useAutomationExtension', False)
-    
     # driver = webdriver.Chrome(options=chrome_options)
     driver = webdriver.Chrome(service=service, options=chrome_options)
     driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
-
-   
     print(f"driver setup finished")
     return driver
     
@@ -103,51 +67,11 @@ def click_continue_button(driver):
         driver.quit()  # Quit the driver immediately upon error
         raise  # Re-raise the exception for further handling
 
-# Function to fill out the initial form
-def fill_initial_form(driver, row):
-    global user_password
-    print(f"fill_initial_form started")
-    try:
-        # Navigate to the registration page
-        driver.maximize_window()
-        driver.get(landing_url)  # Replace with the actual URL
-        join_button = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, "//a[contains(text(), 'Join')]"))
-        )
-        time.sleep(random.uniform(2.0, 3.0))
-        # Click the button
-        move_and_click(driver, join_button)
-        print("Join button clicked successfully")
-        WebDriverWait(driver, 30).until(
-            EC.presence_of_element_located((By.NAME, "emailaddress"))
-        )
-        
-
-        # Fill in the initial form fields
-        phone_last_three = str(row['Telephone'])  # Get the last three digits of the telephone number
-        user_id = f"{row['forename']}{row['surname']}{phone_last_three}"
-        user_id = user_id.replace(" ", "")
-        user_id = user_id.replace("'", "")
-        user_id = user_id.lower()
-       
-        user_password = generate_strong_password(random.randint(8, 13))
-        
-       
-       
-     
-
-        
-        
-     
-        continue_button_1_clickable = WebDriverWait(driver, 4).until(EC.element_to_be_clickable((By.XPATH, "(//button[@id='continue'])[1]")))
-
-        
-        # click_continue_button(driver,1)
-        time.sleep(2.5)
-    except Exception as e:
-        
-        driver.quit()  # Quit the driver immediately upon error
-        raise  # Re-raise the exception for further handling
+def click_create_account_button(driver):
+    time.sleep(random.uniform(1.0, 1.5))
+    createAccountBtn = driver.find_element(By.CSS_SELECTOR, 'button[data-qa="SubmitForm"]')
+    move_and_click(driver, createAccountBtn)
+    time.sleep(random.uniform(8.0, 10.0))
 
 def move_mouse_smoothly(x1, y1, x2, y2, duration=1.0):
     """Move the mouse smoothly between two points using random intermediate steps."""
@@ -196,113 +120,6 @@ def move_and_click(driver, target, view=True):
 
     actions = ActionChains(driver)
     actions.move_to_element(target).click().perform()
-
-
-def select_gender(driver, gender, row):
-    print(f"select_gender_started")
-    try:
-        if gender.lower() == "mr":
-            male_label = driver.find_element(By.XPATH, "//label[@for='Male']")
-            move_and_click(driver, male_label)
-
-        elif gender.lower() == "ms":
-            female_label = driver.find_element(By.XPATH, "//label[@for='Female']")
-            move_and_click(driver, female_label)
-
-        else:
-            male_label = driver.find_element(By.XPATH, "//label[@for='Male']")
-            move_and_click(driver, male_label)
-            
-        print(f"select_gender_finished")
-    except Exception as e:
-        print(f"Error selecting gender: {e}")
-        driver.quit()  # Quit the driver immediately upon error
-        raise  # Re-raise the exception for further handling
-
-def fill_additional_details_1(driver, row):
-    print(f"fill_additional_details_1_started")
-
-
-        
-def toggle_select_all_promotion_options(driver,row):
-    print(f"toggle_select_all_promotion_options_started")
-    try:
-        # Wait until the checkbox is clickable
-        checkbox_label = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//label[@for='selectallpromotionoptions']")))
-        move_and_click(driver, checkbox_label, False)
-        # checkbox_label.click()  # Click to select the checkbox
-        print("Checkbox 'Select All Promotion Options' is now checked.")
-
-        print(f"toggle_select_all_promotion_options_started")
-    except Exception as e:
-        print(f"Error toggling the checkbox: {e}")
-        driver.quit()  # Quit the driver immediately upon error
-        raise  # Re-raise the exception for further handling
-
-def click_create_account_button(driver,row):
-    print(f"click_create_account_button_started")
-    try:
-        time.sleep(1)
-        
-        submit_button = driver.find_element(By.ID, "submit")
-        
-        # actions = ActionChains(driver)
-
-        # actions.move_to_element(submit_button).pause(random.uniform(0.5, 1.0)).perform()
-        move_and_click(driver, submit_button, False)
-        print("Successfully clicked the 'Create my account' button.")
-
-        print(f"click_create_account_button_finished")
-    except Exception as e:
-        print(f"Error clicking the 'Create my account' button: {e}")
-        driver.quit()  # Quit the driver immediately upon error
-        raise  # Re-raise the exception for further handling
-
-def fill_additional_details_2(driver, row):
-    print(f"fill_additional_details_2_started")
-    try:
-        phone_input = driver.find_element(By.NAME, "mobilenumber")
-        move_and_click(driver, phone_input)
-        type_slowly(phone_input, str(row['Telephone']))
-        
-        click_enter_address_manually(driver, row)
-        house_number = row['House_Number']
-        house_number_len = len(str(house_number))
-        address = ""
-        if(house_number_len <= 3):
-            print("left style")
-            address = row['ad1']        
-            if type(row['ad2']) == str:
-                address += ', ' + row['ad2']
-        else:
-            print("right style")
-            address = house_number
-            if(type(row['ad1'])) == str:
-                address += ', ' + row['ad1']
-        print(address)
-        address_input = driver.find_element(By.NAME, "addressline1")
-        move_and_click(driver, address_input, False)
-
-        type_slowly(address_input, address)
-
-        city_input = driver.find_element(By.NAME, "addresscity")
-        move_and_click(driver, city_input, False)
-        type_slowly(city_input, row['ad4'])
-
-        zip_input = driver.find_element(By.NAME, "addresszip")
-        move_and_click(driver, zip_input,False)
-        type_slowly(zip_input, row['postcode'])
-
-
-        toggle_select_all_promotion_options(driver, row)
-        time.sleep(random.uniform(1.0, 3.0))
-        click_create_account_button(driver, row)
-        time.sleep(random.uniform(9.5, 10.5))  # Wait for the submission to complete
-        print(f"fill_additional_details_2_finished")
-    except Exception as e:
-        print(f"Error filling additional details2 for : {e}")
-        driver.quit()  # Quit the driver immediately upon error
-        raise  # Re-raise the exception for further handling
 
 def log_error(row, log_file='error_log.txt'):
     with open(log_file, 'a+') as f:
@@ -402,20 +219,32 @@ def input_userName(driver, row):
     click_continue_button(driver)
     
 def input_securityQuestion(driver, row):
-    maidenNameComponent = driver.find_element(By.CSS_SELECTOR, 'input[data-qa="MotherMaidenInput"]')
+    maidenNameComponent = driver.find_element(By.CSS_SELECTOR, 'input[data-qa="MothersMaidenInput"]')
     type_slowly(maidenNameComponent, "miss")
+    time.sleep(random.uniform(0.5, 1.0))
     securityAnswerComponent = driver.find_element(By.CSS_SELECTOR, 'input[data-qa="SecurityAnswerInput"]')
     type_slowly(securityAnswerComponent, "cat")
     click_continue_button(driver)
     
-def pin(driver, row):
-    pin1 = driver.find_element(By.ID, "1")
-    type_slowly(pin1, str(row['Telephone'])[-6:][::-1])
+def input_pin(driver, row):
+    digit = "071100"
+    for i in range(1, 7): 
+        pin_element = driver.find_element(By.ID, str(i)) 
+        digit_to_type = digit[i-1] 
+        type_slowly(pin_element, digit_to_type)  
     click_continue_button(driver)
-
+    
+def input_terms(driver, now):
+    marketingComponent = driver.find_element(By.CSS_SELECTOR, 'input[data-qa="MarketingInput"]')
+    move_and_click(driver, marketingComponent)
+    time.sleep(random.uniform(0.5, 1.0))
+    termsComponent = driver.find_element(By.CSS_SELECTOR, 'input[data-qa="TermsPPCheck"]')
+    move_and_click(driver, termsComponent)
+    
+    click_create_account_button(driver)
+    
 
 def main():
-    global user_password
     successful_count = 1
     location_index = 0
     # Fetch proxies from the URL
@@ -491,7 +320,6 @@ def main():
         finally:
             # auth_thread.join()  # Wait for the authentication thread to finish
             data.at[index, 'result'] = result
-            data.at[index, 'password'] = user_password
             driver.quit()  # Ensure the browser is closed after processing.
             time.sleep(3)
    
