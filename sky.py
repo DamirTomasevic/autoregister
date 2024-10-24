@@ -222,6 +222,7 @@ def select_gender(driver, gender, row):
 def fill_additional_details_1(driver, row):
     print(f"fill_additional_details_1_started")
 
+
         
 def toggle_select_all_promotion_options(driver,row):
     print(f"toggle_select_all_promotion_options_started")
